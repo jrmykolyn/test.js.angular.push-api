@@ -1,4 +1,5 @@
 const webPush = require('web-push');
+const db = require('../db');
 const utils = require('../utils');
 const vapidDetails = require('../vapid');
 const subscription = require('../sub');
@@ -8,11 +9,16 @@ const notifications = (req, res, cb) => {
 
   if (!id) return cb(new Error('Must include ID'));
 
-  webPush.setVapidDetails(...Object.values(vapidDetails));
-  webPush.sendNotification(subscription, JSON.stringify({ title }))
-    .then((response) => console.log('__ SUCCESSFULLY SENT PUSH NOTIFICATION'))
-    .catch((err) => console.error('__ FAILED TO SEND PUSH NOTIFICATION'))
-    .then(() => res.end());
+  db.subscriptions.find({}, (err, subs) => {
+    const [sub] = subs.filter((sub) => sub.id === decodeURI(id));
+    if (!sub) return cb(new Error('Invalid ID'));
+
+    webPush.setVapidDetails(...Object.values(vapidDetails));
+    webPush.sendNotification(subscription, JSON.stringify({ title }))
+      .then((response) => cb(null, response))
+      .catch((err) => cb(new Error('Failed to send notification')))
+  });
+
 };
 
 module.exports = notifications;
