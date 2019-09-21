@@ -16,7 +16,7 @@ const server = http.createServer((req, res) => {
     case 'subscriptions':
       return routes[root](req, res, (err, data) => {
         if (err) console.log(err) || res.end(err.message);
-        res.end();
+        res.end(data);
       });
     default:
       return res.end();
