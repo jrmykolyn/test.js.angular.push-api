@@ -15,7 +15,7 @@ const server = http.createServer((req, res) => {
     case 'notifications':
     case 'subscriptions':
       return routes[root](req, res, (err, data) => {
-        if (err) console.log(err);
+        if (err) console.log(err) || res.end(err.message);
         res.end();
       });
     default:

@@ -2,7 +2,6 @@ const webPush = require('web-push');
 const db = require('../db');
 const utils = require('../utils');
 const vapidDetails = require('../vapid');
-const subscription = require('../sub');
 
 const notifications = (req, res, cb) => {
   const { id, title = 'Default Title' } = utils.getQueryStringParams(req.url);
@@ -10,8 +9,8 @@ const notifications = (req, res, cb) => {
   if (!id) return cb(new Error('Must include ID'));
 
   db.subscriptions.find({}, (err, subs) => {
-    const [sub] = subs.filter((sub) => sub.id === decodeURI(id));
-    if (!sub) return cb(new Error('Invalid ID'));
+    const [{ subscription }] = subs.filter((sub) => sub.id === decodeURI(id));
+    if (!subscription) return cb(new Error('Invalid ID'));
 
     webPush.setVapidDetails(...Object.values(vapidDetails));
     webPush.sendNotification(subscription, JSON.stringify({ title }))
