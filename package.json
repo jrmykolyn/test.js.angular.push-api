@@ -9,6 +9,7 @@
   "author": "Jesse R Mykolyn",
   "license": "ISC",
   "dependencies": {
+    "nedb": "^1.8.0",
     "web-push": "^3.3.5"
   }
 }
