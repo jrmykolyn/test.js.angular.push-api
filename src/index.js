@@ -1,28 +1,26 @@
 const http = require('http');
-const webPush = require('web-push');
-const vapidDetails = require('./vapid');
-const subscription = require('./sub');
-
-const getQueryStringParams = (url = '') => {
-  if (!url.includes('?')) return {};
-  return url.substring(url.indexOf('?') + 1)
-    .split('&')
-    .map((pair) => pair.split('='))
-    .map(([key, value]) => ({ [key]: value }))
-    .reduce((acc, o) => ({ ...acc, ...o }), {});
-};
-
-webPush.setVapidDetails(...Object.values(vapidDetails));
+const path = require('path');
+const utils = require('./utils');
+const routes = require('./routes');
 
 const server = http.createServer((req, res) => {
-  const { id, title = 'Default Title' } = getQueryStringParams(req.url);
+  // Handle CORS.
+  res.setHeader('Access-Control-Allow-Origin', '*/*');
 
-  if (!id) return res.end('Must include id');
+  const path = utils.getPath(req.url);
+  const segments = utils.getSegments(path);
+  const [root] = segments;
 
-  webPush.sendNotification(subscription, JSON.stringify({ title }))
-    .then((response) => console.log('__ SUCCESSFULLY SENT PUSH NOTIFICATION'))
-    .catch((err) => console.error('__ FAILED TO SEND PUSH NOTIFICATION'))
-    .then(() => res.end());
+  switch (root) {
+    case 'notifications':
+    case 'subscriptions':
+      return routes[root](req, res, (err, data) => {
+        if (err) console.log(err);
+        res.end();
+      });
+    default:
+      return res.end();
+  }
 });
 
 server.listen(4600, () => console.log('LISTENING ON PORT: 4600'));
