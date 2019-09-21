@@ -14,7 +14,7 @@ const notifications = (req, res, cb) => {
 
     webPush.setVapidDetails(...Object.values(vapidDetails));
     webPush.sendNotification(subscription, JSON.stringify({ title }))
-      .then((response) => cb(null, response))
+      .then((response) => cb(null, ''))
       .catch((err) => cb(new Error('Failed to send notification')))
   });
 
