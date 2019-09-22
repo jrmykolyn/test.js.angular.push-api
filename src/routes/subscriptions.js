@@ -18,10 +18,11 @@ const subscriptions = (req, res, cb) => {
 
       req.on('end', () => {
         const newSub = JSON.parse(body.toString());
-        db.subscriptions.find({}, (err, subs) => {
-          const ids = subs.map(({ id }) => id);
 
-          if (ids.includes(newSub.id)) return cb(new Error('Subscription exists for ID: ' + newSub.id));
+        db.subscriptions.find({}, (err, subs) => {
+          const endpoints = subs.map(({ subscription }) => subscription.endpoint);
+
+          if (endpoints.includes(newSub.subscription.endpoint)) return cb(new Error('Subscription exists for endpoint.'));
 
           db.subscriptions.insert(newSub, (err, data) => {
             if (err) return cb(err);
