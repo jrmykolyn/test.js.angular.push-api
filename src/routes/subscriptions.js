@@ -17,9 +17,16 @@ const subscriptions = (req, res, cb) => {
       });
 
       req.on('end', () => {
-        db.subscriptions.insert(JSON.parse(body.toString()), (err, data) => {
-          if (err) return cb(err);
-          return cb(null, '');
+        const newSub = JSON.parse(body.toString());
+        db.subscriptions.find({}, (err, subs) => {
+          const ids = subs.map(({ id }) => id);
+
+          if (ids.includes(newSub.id)) return cb(new Error('Subscription exists for ID: ' + newSub.id));
+
+          db.subscriptions.insert(newSub, (err, data) => {
+            if (err) return cb(err);
+            return cb(null, '');
+          });
         });
       });
       break;
