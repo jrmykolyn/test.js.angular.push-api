@@ -5,7 +5,11 @@ const routes = require('./routes');
 
 const server = http.createServer((req, res) => {
   // Handle CORS.
-  res.setHeader('Access-Control-Allow-Origin', '*/*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+
+  // Always allow OPTIONS-type request.
+  if (req.method === 'OPTIONS') return res.end();
 
   const path = utils.getPath(req.url);
   const segments = utils.getSegments(path);
