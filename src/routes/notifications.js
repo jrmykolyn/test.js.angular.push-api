@@ -13,7 +13,7 @@ const notifications = (req, res, cb) => {
       req.on('end', () => {
         const data = JSON.parse(body.toString());
         const { payload } = data;
-        const { id, title = 'Default Title' } = payload;
+        const { id, ...rest } = payload;
 
         if (!id) return cb(new Error('Must include ID'));
 
@@ -24,7 +24,7 @@ const notifications = (req, res, cb) => {
           if (!subscription) return cb(new Error('Invalid ID'));
 
           webPush.setVapidDetails(...Object.values(vapidDetails));
-          webPush.sendNotification(subscription, JSON.stringify({ title }))
+          webPush.sendNotification(subscription, JSON.stringify(rest))
             .then((response) => cb(null, 'Successfully sent notification.'))
             .catch((err) => cb(new Error('Failed to send notification')))
         });
