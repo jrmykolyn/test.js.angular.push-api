@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
   const [root] = segments;
 
   switch (root) {
+    case 'keys':
     case 'notifications':
     case 'subscriptions':
       return routes[root](req, res, (err, data) => {
